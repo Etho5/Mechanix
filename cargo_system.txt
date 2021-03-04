@@ -1,0 +1,19 @@
+Cargo networks consist of three kinds of pipes:
+1) Pipe: Transfers items from itself to another pipe with an identical network.
+2) Output Pipe: Takes items from a container/Machine and puts them into itself, ready to go into a connected Pipe. Has a network, meaning that it will only deposit its items into Pipes of the same network.
+3) Input Pipe: Takes items from a connected Pipe and puts them into a container/Machine. Has a network, meaning that it will only take items from Pipes of the same network.
+4) Gateway Pipe: Only allows specified whitelisted items* to pass through it. Has a network, meaning that it will only deposit/take items to/from Pipes of the same network. Can place a container next to it to deposit non-whitelisted items into; otherwise the items are deleted. These lack directionality; any items that pass through it will attempt to continue in the direction it was going when it entered the Gateway Pipe.
+5) Director Pipe: Determines the direction of travel for items through a cargo network.  (i.e., -/+X, -/+Y, -/+Z) Without this pipe, items will not flow beyond an Output Pipe.
+*An empty whitelist will make a Gateway Pipe act as if a normal Pipe.
+
+A-Check
+Input Pipes put items into their container/Machine.
+
+B-Check
+Output Pipes check to see if any Director Pipes are connected to it. If any are, its item is transferred to it and the item's direction is set to that of the Director Pipe. If not, the item stays in the Output Pipe, halting the outflow of items.
+All Pipes attempt to move items to non-output pipes. This only occurs if both the two pipes are on the same network, and if the pipe being transferred to is in the direction of the item being transferred. 
+The Gateway Pipe check is run, and if any items are in a Gateway Pipe, they are dealt with according to the specified whitelist. 
+The Director Pipe check is run, and any items that should have their directions changed, are.
+
+C-Check
+Output Pipes take items from their container/Machine.
