@@ -1,0 +1,30 @@
+Wires store two points of information:
+⦁	Their energy (int/double, in J)
+⦁	"Check" status (byte)
+⦁	0 = not checked
+⦁	1 = checked
+⦁	2 = need to check
+⦁	3 = inert
+
+A-Check
+Energy starts from a generator, which checks every second to see if it has enough energy to
+theoretically do anything(<= 50J). If it does, it checks each BlockFace to see if there is
+technology. Each wire that this finds gets energy and has its "check" status set to 2 (need to
+check). (If there is a machine connected, it just gives energy directly to it.) This happens for
+each wire connected to the generator, or until the generator runs out.
+
+B-Check
+Each second, another check will run, this time for all wires set to a "check" status of 2 (need
+to check). This performs the same check as a generator, checking each BlockFace for
+technology. If it finds a machine, it will give energy to the machine and move on, if it hasn't
+run out of energy. If it finds a wire with a "check" status of 0 (not checked), it transfers the
+correct amount of energy and sets that wire's "check" status to 2 (need to check). When all
+checks are run, the "parent" wire is set to a "check" status of 1 (checked) and the process repeats.
+
+C-Check
+Another check runs after this, those of wires of "check" status 1 (checked) and 3 (inert). First,
+all wires of "check" status 3 are set to "check" status 0 (not checked). Then, it goes through to
+see if any wires of "check" status 2 are next to it. If there are any, set it to "check" status 3
+(inert); it's still important for the next C-check. If none are present, however, the wire's
+"check" status is set to 0 (not checked), since the wire currently has nothing to feed into it,
+and thus has no reason to be having "check" status 1.
