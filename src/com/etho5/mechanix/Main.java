@@ -14,8 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 
     private static Main instance;
-    private final Persist persist = new Persist();
-    private MachineManager manager;
+//    private final Persist persist = new Persist();
+//    private MachineManager manager;
 
     public void onEnable() {
 //        System.out.println("[Mechanix] Loading machine data...");
@@ -26,11 +26,19 @@ public class Main extends JavaPlugin {
         registerListeners(new BlockBreak(), new BlockPlace(), new PlayerInteract(), new AsyncPlayerChat(), new InventoryClick(), new InventoryClose());
         getCommand("mechanix").setExecutor(new MachineMain());
         getCommand("mechanix").setTabCompleter(new MachineMain());
-        System.out.println("[Mechanix] All listeners registered.");
+        System.out.println("[Mechanix] Listeners registered.");
+
+        System.out.println("[Mechanix] Loading recipes...");
+//        MachineSerializer.loadRecipes();
+        System.out.println("[Mechanix] Recipes loaded.");
 
         System.out.println("[Mechanix] Loading machines...");
-        MachineSerializer.loadMachines();
-        System.out.println("[Mechanix] Machines loaded.");
+//        MachineSerializer.loadMachines();
+        if(MachineSerializer.loadMachines()) {
+            System.out.println("[Mechanix] Machine data has been loaded.");
+        } else {
+            System.out.println("[Mechanix] Error with machine loading! Check stack trace above!");
+        }
 
         System.out.println("[Mechanix] Loading menus...");
         MenuManager.generateMenus();
@@ -42,9 +50,6 @@ public class Main extends JavaPlugin {
 //        if(!manager.isCacheEmpty()) {
 //            for (List<Machine> l : manager.machinesCache.values()) {
 //                for (Machine m : l) {
-//                    new ACheck(m).runTaskTimer(this, 0L, 20L);
-//                    new BCheck(m).runTaskTimer(this, 0L, 20L);
-//                    new CCheck(m).runTaskTimer(this, 0L, 20L);
 //                    new UpdateMachine(m.getMachineInventory().getInventory(), m).runTaskTimer(this, 0L, 20L);
 //                }
 //            }
@@ -53,17 +58,20 @@ public class Main extends JavaPlugin {
 
         System.out.println("[Mechanix] Mechanix has been successfully enabled.");
 
+        new ChargesMove().runTaskTimer(this, 0L,20L);
         new UpdateMachines().runTaskTimer(this, 0L, 60L);
-        new ACheck().runTaskTimer(this, 0L, 2L);
-        new BCheck().runTaskTimer(this, 1L, 2L);
-        new CCheck().runTaskTimer(this, 2L, 2L);
+        new GeneratorUpdate().runTaskTimer(this, 10L, 20L);
     }
 
     public void onDisable() {
         System.out.println("[Mechanix] Saving machine data...");
 //        if(manager != null) persist.save(manager);
-        MachineSerializer.saveMachines();
-        System.out.println("[Mechanix] Machine data has been saved.");
+//        MachineSerializer.saveMachines();
+        if(MachineSerializer.saveMachines()) {
+            System.out.println("[Mechanix] Machine data has been saved.");
+        } else {
+            System.out.println("[Mechanix] Error with machine saving! Check stack trace above!");
+        }
 
         System.out.println("[Mechanix] Mechanix has been successfully disabled.");
     }
@@ -98,9 +106,9 @@ public class Main extends JavaPlugin {
 //        }
 //    }
 
-    public MachineManager getManager() {
-        return manager;
-    }
+//    public MachineManager getManager() {
+//        return manager;
+//    }
 
 //    public void saveConfigurations() {
 //        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {

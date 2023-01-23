@@ -12,14 +12,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.io.Serializable;
 import java.util.Collections;
 
-public enum MachineItem {
+public enum MachineItem implements Serializable {
 
     @SerializedName("Wire")
-    WIRE(MachineType.WIRE, 10, 10, Material.GREEN_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Wire", "Transmits energy at a rate of 10 J/s.", 0),
-    @SerializedName("InsulatedWire")
-    INSULATED_WIRE(MachineType.WIRE, 25, 25, Material.LIME_STAINED_GLASS_PANE, ChatColor.GREEN + "Insulated Wire", "Transmits energy at a rate of 25 J/s.", 0),
+    WIRE(MachineType.WIRE, 6000, 20, Material.GREEN_STAINED_GLASS_PANE, ChatColor.DARK_GREEN + "Wire", "A standard, home-grade wire. Transmits charge at a rate of 15 Amperes.", 0),
+    @SerializedName("JunctionWire")
+    JUNCTION_WIRE(MachineType.JUNCTION_WIRE, 6000, 20, Material.YELLOW_STAINED_GLASS_PANE, ChatColor.GREEN + "Junction Wire", "Specifies a direction that charges must flow in.", 0),
     @SerializedName("Pipe")
     PIPE(MachineType.CARGO, 0, 0, Material.BLACK_STAINED_GLASS_PANE, ChatColor.GRAY + "Pipe", "Moves items through itself from one place to another.", 0),
     @SerializedName("OutputPipe")
@@ -31,38 +32,40 @@ public enum MachineItem {
     @SerializedName("DirectorPipe")
     DIRECTOR_PIPE(MachineType.CARGO, 0, 0, Material.ORANGE_STAINED_GLASS_PANE, ChatColor.GOLD + "Director Pipe", "Sets the direction of travel of items in a cargo network.", 0),
     @SerializedName("CombustionEngine")
-    COMBUSTION_ENGINE(new CombustionEngine(), MachineType.GENERATOR, 5000, 10, Material.BLAST_FURNACE, ChatColor.DARK_GRAY + "Combustion Engine", "Uses heat to generate a small stream of energy.", 0),
+    COMBUSTION_ENGINE(new CombustionEngine(), MachineType.GENERATOR, 5000,  60, Material.BLAST_FURNACE, ChatColor.DARK_GRAY + "Combustion Engine", "Uses heat to generate 60 C of charge every cycle.", 0),
     @SerializedName("ArcFurnace")
-    ARC_FURNACE(new ArcFurnace(), MachineType.MACHINE, 10000, 25, Material.CHISELED_QUARTZ_BLOCK, ChatColor.WHITE + "Arc Furnace", "Heats materials faster and more precisely.", 20),
+    ARC_FURNACE(new ArcFurnace(), MachineType.MACHINE, 10000, 30, Material.CHISELED_QUARTZ_BLOCK, ChatColor.WHITE + "Arc Furnace", "Heats materials faster and more precisely.", 20),
     @SerializedName("AutoAnvil")
-    AUTO_ANVIL(new AutoAnvil(), MachineType.MACHINE, 10000, 50, Material.IRON_BLOCK, ChatColor.WHITE + "Auto Anvil", "Repairs items without the need for XP.", 200),
+    AUTO_ANVIL(new AutoAnvil(), MachineType.MACHINE, 10000, 60, Material.IRON_BLOCK, ChatColor.WHITE + "Auto Anvil", "Repairs items without the need for XP.", 200),
     @SerializedName("Freezer")
-    FREEZER(new Freezer(), MachineType.MACHINE, 10000, 25, Material.BLUE_STAINED_GLASS, ChatColor.BLUE + "Freezer", "Cools substances rapidly with electrical power.", 40),
+    FREEZER(new Freezer(), MachineType.MACHINE, 10000, 30, Material.BLUE_STAINED_GLASS, ChatColor.BLUE + "Freezer", "Cools substances rapidly with electrical power.", 40),
     @SerializedName("Grinder")
-    GRINDER(new Grinder(), MachineType.MACHINE, 10000, 50, Material.FURNACE, ChatColor.DARK_GRAY + "Grinder", "A simple electric stone processing unit.", 40),
+    GRINDER(new Grinder(), MachineType.MACHINE, 10000, 60, Material.FURNACE, ChatColor.DARK_GRAY + "Grinder", "A simple, electric stone-processing unit.", 40),
     @SerializedName("Incinerator")
-    INCINERATOR(new Incinerator(), MachineType.GENERATOR, 5000, 10, Material.SMOKER, ChatColor.DARK_GREEN + "Incinerator", "Burns organic matter to produce energy.", 0),
+    INCINERATOR(new Incinerator(), MachineType.GENERATOR, 5000, 60, Material.SMOKER, ChatColor.DARK_GREEN + "Incinerator", "Burns organic matter to produce 60 C of charge every cycle.", 0),
     @SerializedName("Sifter")
-    SIFTER(new Sifter(), MachineType.MACHINE, 10000, 50, Material.CHISELED_STONE_BRICKS, ChatColor.GRAY + "Sifter", "Sieves through dusts and other grainy material.", 40),
+    SIFTER(new Sifter(), MachineType.MACHINE, 10000, 60, Material.CHISELED_STONE_BRICKS, ChatColor.GRAY + "Sifter", "Sieves through dusts and other grainy material.", 40),
     @SerializedName("PrintingPress")
-    PRINTING_PRESS(new PrintingPress(), MachineType.MACHINE, 15000, 100, Material.BOOKSHELF, ChatColor.GOLD + "Printing Press", "Enchants books with random level 1 enchantments.", 100),
+    PRINTING_PRESS(new PrintingPress(), MachineType.MACHINE, 15000, 120, Material.BOOKSHELF, ChatColor.GOLD + "Printing Press", "Enchants books automatically with random level 1 enchantments using bottled experience.", 100),
     @SerializedName("Facilitator")
-    FACILITATOR(new Facilitator(), MachineType.MACHINE, 20000, 100, Material.WHITE_STAINED_GLASS, ChatColor.WHITE + "Facilitator", "Can perform simple two-ingredient chemical reactions.", 120),
+    FACILITATOR(new Facilitator(), MachineType.MACHINE, 20000, 120, Material.WHITE_STAINED_GLASS, ChatColor.WHITE + "Facilitator", "Can perform simple, two-ingredient chemical reactions.", 120),
     @SerializedName("OreProcessor")
-    ORE_PROCESSOR(new OreProcessor(), MachineType.MACHINE, 10000, 50, Material.SMOOTH_STONE, ChatColor.DARK_GRAY + "Ore Processor", "Gets out even the most well-hidden ores.", 80),
+    ORE_PROCESSOR(new OreProcessor(), MachineType.MACHINE, 10000, 120, Material.SMOOTH_STONE, ChatColor.DARK_GRAY + "Ore Processor", "Gets out even the most well-hidden ores.", 80),
+    @SerializedName("GeothermalEngine")
+    GEOTHERMAL_ENGINE(new GeothermalEngine(), MachineType.GENERATOR, 50000, 300, Material.DROPPER, ChatColor.GRAY + "Steam Engine", "Uses lava and water to power a steam turbine, producing 300 C of energy every cycle",0)
     ;
 
     public final MachineRecipe recipe;
     public final ItemStack item;
     public final MachineType invType;
-    public final int maxEnergy, energyPerSecond;
+    public final int maxCharge, current;
     public final long delay;
-    MachineItem(MachineRecipe recipe, MachineType invType, int maxEnergy, int energyPerSecond, Material type, String displayName, String info, int delay) {
+    MachineItem(MachineRecipe recipe, MachineType invType, int maxCharge, int current, Material type, String displayName, String info, int delay) {
         this.recipe = recipe;
         this.invType = invType;
         this.item = new ItemStack(type);
-        this.maxEnergy = maxEnergy;
-        this.energyPerSecond = energyPerSecond;
+        this.maxCharge = maxCharge;
+        this.current = current;
         this.delay = delay;
         ItemMeta meta = this.item.getItemMeta();
         if(meta != null) {
@@ -73,12 +76,12 @@ public enum MachineItem {
         this.item.setItemMeta(meta);
     }
 
-    MachineItem(MachineType invType, int maxEnergy, int energyPerSecond, Material type, String displayName, String info, int delay) {
+    MachineItem(MachineType invType, int maxCharge, int current, Material type, String displayName, String info, int delay) {
         this.recipe = null;
         this.invType = invType;
         this.item = new ItemStack(type);
-        this.maxEnergy = maxEnergy;
-        this.energyPerSecond = energyPerSecond;
+        this.maxCharge = maxCharge;
+        this.current = current;
         this.delay = delay;
         ItemMeta meta = this.item.getItemMeta();
         if(meta != null) {

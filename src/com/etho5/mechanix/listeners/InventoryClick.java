@@ -19,6 +19,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 
@@ -37,6 +38,15 @@ public class InventoryClick implements Listener {
             if(!machInv.getType().getClickableSlotList().contains(e.getRawSlot())) e.setCancelled(true);
 
             if(machInv.getType() == MachineType.WIRE) e.setCancelled(true);
+
+            if(machInv.getType() == MachineType.JUNCTION_WIRE) {
+                if(e.getRawSlot() == 11) {
+                    e.setCancelled(true);
+                    Direction d = machInv.getDirection();
+                    machInv.changeDirection(machInv.getInventory(), d.next());
+                    e.getInventory().setItem(11, new ItemBuilder(e.getCurrentItem()).setDisplayName(machInv.getDirection().name()).build());
+                }
+            }
 
             else if(machInv.getType() == MachineType.MACHINE) {
                 if (e.getRawSlot() == 27) {
@@ -83,7 +93,7 @@ public class InventoryClick implements Listener {
             if(e.getClickedInventory() == p.getOpenInventory().getBottomInventory()) return;
             if(e.getCurrentItem() == null) return;
 
-            if(e.getCurrentItem().isSimilar(new ItemBuilder(Material.GREEN_WOOL).setDisplayName(ChatColor.GREEN + "Next page").build())) {
+            if(e.getCurrentItem().isSimilar(new ItemBuilder(Material.LIME_WOOL).setDisplayName(ChatColor.GREEN + "Next page").build())) {
                 System.out.println("Inventory Click - green wool");
                 if(MenuManager.ingredientMenus.containsKey(menu.getPage() + 1) && e.getView().getTitle().equals(ChatColor.GRAY + "Ingredients and Components")) {
                     System.out.println("Inventory Click - is next page");
@@ -113,7 +123,7 @@ public class InventoryClick implements Listener {
 
             else for(ItemStack key : MenuManager.menus.keySet()) {
                 if(Utils.isSimilar(e.getCurrentItem(), key)) {
-                    System.out.println("Inventory Click - Clicked type: " + key.getType().toString());
+                    System.out.println("Inventory Click - Clicked type: " + key.getType());
                     p.closeInventory();
                     new OpenInventory(p, MenuManager.menus.get(key).getInventory()).runTaskLater(Main.getInstance(), 1);
                     return;

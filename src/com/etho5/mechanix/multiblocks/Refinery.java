@@ -1,6 +1,5 @@
 package com.etho5.mechanix.multiblocks;
 
-import com.etho5.PlanetaryItems.objects.PlanetItems;
 import com.etho5.mechanix.abstraction.Multiblock;
 import com.etho5.mechanix.ingredients.IngredientList;
 import org.bukkit.ChatColor;
@@ -54,13 +53,6 @@ public class Refinery extends Multiblock {
         });
 
         // carbon
-        recipes.put(IngredientList.CARBON.getItem(4), new ItemStack[]{
-                null, PlanetItems.UNREFINED_CARBON.getItem(), null,
-                PlanetItems.UNREFINED_CARBON.getItem(), null, PlanetItems.UNREFINED_CARBON.getItem(),
-                null, PlanetItems.UNREFINED_CARBON.getItem(), null
-        });
-
-        // carbon but normal
         recipes.put(IngredientList.CARBON.getItem(2), new ItemStack[]{
                 new ItemStack(Material.COAL), new ItemStack(Material.CHARCOAL), new ItemStack(Material.COAL),
                 new ItemStack(Material.CHARCOAL), new ItemStack(Material.COAL), new ItemStack(Material.CHARCOAL),

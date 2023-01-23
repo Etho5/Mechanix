@@ -104,7 +104,7 @@ public enum IngredientList {
     @SerializedName("Commutator")
     COMMUTATOR(ChatColor.GRAY, "The spinny part of a motor.", 536128),
     @SerializedName("Motor")
-    MOTOR(ChatColor.DARK_GRAY, "This can most indeed spin.", 536129),
+    MOTOR(ChatColor.DARK_GRAY, "This can indeed spin.", 536129),
     @SerializedName("HeatingCoil")
     HEATING_COIL(ChatColor.DARK_RED, "You can get close, but not too close.", 536130),
     @SerializedName("LeadAcidBattery")
@@ -120,7 +120,9 @@ public enum IngredientList {
     @SerializedName("MachineInfoTerminal")
     MACHINE_INFO_TERMINAL(ChatColor.YELLOW, "Displays all possible outputs for a clicked Machine.", 536135),
     @SerializedName("Laser")
-    LASER(ChatColor.DARK_RED, "Emits a high-energy beam of photons.", 536136)
+    LASER(ChatColor.DARK_RED, "Emits a high-energy beam of photons.", 536136),
+    @SerializedName("Fiberglass")
+    FIBERGLASS(ChatColor.WHITE, "A collection of glass fibers, very useful as insulation material", 536137)
     ;
 
     private final Material material;

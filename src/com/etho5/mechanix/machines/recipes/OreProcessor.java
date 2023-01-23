@@ -41,6 +41,7 @@ public class OreProcessor extends MachineRecipe {
         input.add(new ItemStack[]{new ItemStack(Material.GRANITE)});
         input.add(new ItemStack[]{new ItemStack(Material.STONE)});
         input.add(new ItemStack[]{new ItemStack(Material.COBBLESTONE)});
+        input.add(new ItemStack[]{IngredientList.SILICA_SAND.getItem()});
 
         return input;
     }
@@ -49,14 +50,14 @@ public class OreProcessor extends MachineRecipe {
     public List<ItemStack[]> validOutputs() {
         List<ItemStack[]> output = new ArrayList<>();
 
-        output.add(new ItemStack[]{new ItemStack(Material.COAL)});
-        output.add(new ItemStack[]{new ItemStack(Material.IRON_INGOT)});
-        output.add(new ItemStack[]{new ItemStack(Material.REDSTONE, 4)});
-        output.add(new ItemStack[]{new ItemStack(Material.LAPIS_LAZULI, 4)});
-        output.add(new ItemStack[]{new ItemStack(Material.GOLD_INGOT)});
-        output.add(new ItemStack[]{new ItemStack(Material.DIAMOND)});
-        output.add(new ItemStack[]{new ItemStack(Material.EMERALD)});
-        output.add(new ItemStack[]{new ItemStack(Material.QUARTZ)});
+        output.add(new ItemStack[]{new ItemStack(Material.COAL, 2)});
+        output.add(new ItemStack[]{new ItemStack(Material.IRON_INGOT, 2)});
+        output.add(new ItemStack[]{new ItemStack(Material.REDSTONE, 8)});
+        output.add(new ItemStack[]{new ItemStack(Material.LAPIS_LAZULI, 8)});
+        output.add(new ItemStack[]{new ItemStack(Material.GOLD_INGOT, 2)});
+        output.add(new ItemStack[]{new ItemStack(Material.DIAMOND, 2)});
+        output.add(new ItemStack[]{new ItemStack(Material.EMERALD, 2)});
+        output.add(new ItemStack[]{new ItemStack(Material.QUARTZ, 2)});
 
         output.add(new ItemStack[]{IngredientList.SODIUM.getItem()});
         output.add(new ItemStack[]{IngredientList.SILICON.getItem()});

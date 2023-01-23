@@ -4,12 +4,15 @@ import com.etho5.mechanix.machines.*;
 import com.etho5.mechanix.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.block.Dispenser;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -36,13 +39,16 @@ public class CargoManager {
     public static void transferToOutput(Machine source, Machine pipe) {
         if(pipe.getMachineItem() != MachineItem.OUTPUT_PIPE) Bukkit.getLogger().log(Level.WARNING, "Not an output pipe!");
         else {
-            Inventory sourceInv = source.getMachineInventory().getInventory();
+            List<ItemStack> sourceInv = new ArrayList<ItemStack>(){{
+                    source.getMachineInventory().getType().getClickableSlotList().forEach(n -> this.add(source.getMachineInventory().getInventory().getItem(n)));
+                }};
+
             if(!ItemPackage.hasPackage(pipe)) {
                 ItemPackage pack = new ItemPackage(pipe, Utils.getLastItem(sourceInv));
                 System.out.println("Output transferred from machine: " + pack.toString());
-            }
-            if(Utils.getLastItemIndex(sourceInv) != -1) {
-                sourceInv.setItem(Utils.getLastItemIndex(sourceInv), null);
+                if(Utils.getLastItemIndex(sourceInv) != -1) {
+                    source.getMachineInventory().getInventory().setItem(Utils.getLastItemIndex(sourceInv), null);
+                }
             }
         }
     }
@@ -51,12 +57,13 @@ public class CargoManager {
         if(pipe.getMachineItem() != MachineItem.OUTPUT_PIPE) Bukkit.getLogger().log(Level.WARNING, "Not an output pipe!");
         else {
             Inventory sourceInv = source.getInventory();
+            List<ItemStack> items = Arrays.asList(sourceInv.getContents());
             if(!ItemPackage.hasPackage(pipe)) {
-                ItemPackage pack = new ItemPackage(pipe, Utils.getLastItem(sourceInv));
+                ItemPackage pack = new ItemPackage(pipe, Utils.getLastItem(items));
                 System.out.println("Output transferred from container: " + pack.toString());
-            }
-            if(Utils.getLastItemIndex(sourceInv) != -1) {
-                source.getInventory().setItem(Utils.getLastItemIndex(sourceInv), null);
+                if (Utils.getLastItemIndex(items) != -1) {
+                    source.getInventory().setItem(Utils.getLastItemIndex(items), null);
+                }
             }
         }
     }
@@ -71,8 +78,15 @@ public class CargoManager {
                     if (m.getMachineItem().getType() == MachineType.MACHINE) {
                         CargoManager.transferToOutput(m, mach);
                     }
-                } else if (b instanceof Container) {
-                    CargoManager.transferToOutput((Container) b, mach);
+                } else if (b.getType() == Material.CHEST) {
+                    Container c = (Container) b.getState();
+                    System.out.println("Chest found");
+                    CargoManager.transferToOutput(c, mach);
+                }
+                else if(b.getType() == Material.DISPENSER) {
+                    Dispenser d = (Dispenser) b.getState();
+                    System.out.println("Dispenser found");
+                    CargoManager.transferToOutput(d, mach);
                 }
             }
         }
@@ -104,15 +118,7 @@ public class CargoManager {
                         }
                     }
 
-                    else if(b instanceof Container) {
-                        Container to = (Container) b;
-
-                        Inventory inv = to.getInventory();
-
-                        if(ItemPackage.hasPackage(from) && inv.firstEmpty() != -1) {
-                            inv.addItem(ItemPackage.getPackageFromMachine(from).delete().getItem());
-                        }
-                    }
+                    else containerCheck(from, b);
                 }
 
             }
@@ -131,16 +137,20 @@ public class CargoManager {
             }
             else {
                 for(Block b : gateway.getAdjacentBlocks()) {
-                    if(b instanceof Container) {
-                        Container c = (Container) b;
-                        Inventory inv = c.getInventory();
-
-                        if(ItemPackage.hasPackage(gateway) && inv.firstEmpty() != -1) {
-                            inv.addItem(ItemPackage.getPackageFromMachine(gateway).delete().getItem());
-                        }
-                    }
+                    containerCheck(gateway, b);
                 }
             if(ItemPackage.hasPackage(gateway)) ItemPackage.getPackageFromMachine(gateway).delete();
+            }
+        }
+    }
+
+    private static void containerCheck(Machine machine, Block b) {
+        if(b instanceof Container) {
+            Container c = (Container) b.getState();
+            Inventory inv = c.getInventory();
+
+            if(ItemPackage.hasPackage(machine) && inv.firstEmpty() != -1) {
+                inv.addItem(ItemPackage.getPackageFromMachine(machine).delete().getItem());
             }
         }
     }

@@ -2,11 +2,9 @@ package com.etho5.mechanix.listeners;
 
 import com.etho5.mechanix.Main;
 import com.etho5.mechanix.ingredients.IngredientList;
-import com.etho5.mechanix.machines.Machine;
+import com.etho5.mechanix.machines.*;
 import com.etho5.mechanix.abstraction.Multiblock;
-import com.etho5.mechanix.machines.MachineInventory;
-import com.etho5.mechanix.machines.MachineItem;
-import com.etho5.mechanix.machines.MachineManager;
+import com.etho5.mechanix.machines.cargo.Direction;
 import com.etho5.mechanix.menus.MenuBook;
 import com.etho5.mechanix.menus.MenuInventory;
 import com.etho5.mechanix.multiblocks.XPBottler;
@@ -54,30 +52,40 @@ public class PlayerInteract implements Listener {
                     }
                 }
 
+                // placing a machine
                 else if(!MachineManager.isLocationAMachine(loc)) {
-                    loc = Utils.getLocationNextTo(e.getClickedBlock().getLocation(), e.getBlockFace());
-
-                    for (MachineItem mitem : MachineItem.values()) {
-                        if(e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
-                            String name = e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getDisplayName();
-                            final MachineItem mi = MachineItem.fromString(ChatColor.stripColor(name));
-                            if (mi != null && mi == mitem) {
-                                final MachineInventory inv = new MachineInventory(mi, mi.getType());
-                                new Machine(e.getPlayer().getUniqueId(), loc, mi, inv);
-                                return;
-                            }
-                        }
-                    }
+                    placeMachine(e);
                 }
 
                 else {
                     Machine mach = MachineManager.getMachineFromLocation(loc);
-                    e.setCancelled(true);
-                    if (e.getPlayer().getInventory().getItemInMainHand().isSimilar(IngredientList.MACHINE_INFO_TERMINAL.getItem())) {
-                        e.getPlayer().openInventory(new MenuInventory(mach.getMachineItem(), true).getInventory());
-                    } else if (mach.isAllowedPlayer(e.getPlayer().getUniqueId()) || e.getPlayer().hasPermission("mechanix.*")) {
-                        e.getPlayer().openInventory(mach.getMachineInventory().getInventory());
+                    if (e.getPlayer().isSneaking()) {
+                        placeMachine(e);
+                    } else {
+                        e.setCancelled(true);
+                        if (e.getPlayer().getInventory().getItemInMainHand().isSimilar(IngredientList.MACHINE_INFO_TERMINAL.getItem())) {
+                            e.getPlayer().openInventory(new MenuInventory(mach.getMachineItem(), true).getInventory());
+                        } else if (mach.isAllowedPlayer(e.getPlayer().getUniqueId()) || e.getPlayer().hasPermission("mechanix.*")) {
+                            e.getPlayer().openInventory(mach.getMachineInventory().getInventory());
+                        }
                     }
+                }
+            }
+        }
+    }
+
+    private void placeMachine(PlayerInteractEvent e) {
+        Location loc = Utils.getLocationNextTo(e.getClickedBlock().getLocation(), e.getBlockFace());
+
+        for (MachineItem mitem : MachineItem.values()) {
+            if(e.getPlayer().getInventory().getItemInMainHand().getItemMeta() != null) {
+                String name = e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getDisplayName();
+                final MachineItem mi = MachineItem.fromString(ChatColor.stripColor(name));
+                if (mi != null && mi == mitem) {
+                    final MachineInventory inv = new MachineInventory(mi, mi.getType());
+                    new Machine(e.getPlayer().getUniqueId(), loc, mi, inv, new Charge(0, Direction.NONE));
+                    System.out.println("Machine placed");
+                    return;
                 }
             }
         }

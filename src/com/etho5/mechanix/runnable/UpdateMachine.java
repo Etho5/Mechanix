@@ -13,8 +13,8 @@ public class UpdateMachine extends BukkitRunnable {
 
     @Override
     public void run() {
-        MachineRecipe recipe = MachineRecipe.getMachineRecipe(m);
-        if (recipe != null) {
+        MachineRecipe recipe = MachineRecipe.getMachineRecipe(m.getMachineItem());
+        if(recipe != null && m.getMachineInventory() != null) {
             recipe.handleClick(m.getMachineInventory().getInventory(), m);
         }
     }

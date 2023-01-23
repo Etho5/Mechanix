@@ -46,16 +46,16 @@ public class Utils {
         return item;
     }
 
-    public static ItemStack getLastItem(Inventory inv) {
-        for(int i = inv.getSize() - 1; i >= 0; i--) {
-            if(inv.getItem(i) != null) return inv.getItem(i);
+    public static ItemStack getLastItem(List<ItemStack> inv) {
+        for(int i = inv.size() - 1; i >= 0; i--) {
+            if(inv.get(i) != null) return inv.get(i);
         }
         return null;
     }
 
-    public static int getLastItemIndex(Inventory inv) {
-        for(int i = inv.getSize() - 1; i >= 0; i--) {
-            if(inv.getItem(i) != null) return i;
+    public static int getLastItemIndex(List<ItemStack> inv) {
+        for(int i = inv.size() - 1; i >= 0; i--) {
+            if(inv.get(i) != null) return i;
         }
         return -1;
     }

@@ -26,16 +26,16 @@ public class MachineManager {
 
     public static Machine getMachineFromLocation(final Location location) {
         AtomicReference<Machine> retVal = new AtomicReference<>(null);
-        Machine.machines.forEach((k, v) -> {
-            if(k.equals(location)) retVal.set(v);
+        Machine.machines.forEach(k -> {
+            if(k.getLocation().equals(location)) retVal.set(k);
         });
         return retVal.get();
     }
 
     public static boolean isLocationAMachine(final Location location) {
         AtomicBoolean retVal = new AtomicBoolean(false);
-        Machine.machines.keySet().forEach(k -> {
-            if(k.equals(location)) retVal.set(true);
+        Machine.machines.forEach(k -> {
+            if(k.getLocation().equals(location)) retVal.set(true);
         });
         return retVal.get();
     }

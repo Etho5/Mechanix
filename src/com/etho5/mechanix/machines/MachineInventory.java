@@ -10,25 +10,25 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MachineInventory implements InventoryHolder {
+public class MachineInventory implements InventoryHolder, Serializable {
 
     protected transient Inventory inventory;
     protected MachineItem item;
     private transient final MachineType type;
     public static final ItemStack addPlayers = new ItemBuilder(Material.BLUE_STAINED_GLASS_PANE).setDisplayName(ChatColor.AQUA + "Click to add players").build();
     public static final ItemBuilder networkPanel = new ItemBuilder(Material.LIGHT_GRAY_STAINED_GLASS_PANE).setDisplayName(ChatColor.DARK_GRAY + "Network (right click + 1, left click - 1):");
-    public static final ItemBuilder directionPanel = new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName(ChatColor.GREEN + "Direction: ");
+    public static final ItemBuilder directionPanel = new ItemBuilder(Material.COMPASS).setDisplayName(ChatColor.GREEN + "Direction: ");
     public static ItemStack energy = new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Energy: " + ChatColor.RED + "0J").build();
     private int network = 1;
-    private Direction direction;
+    private Direction direction = Direction.POS_X;
 
     public MachineInventory(MachineItem item, MachineType type) {
         this.item = item;
         this.type = item.getType();
-        this.direction = Direction.POS_X;
 
         this.inventory = Bukkit.createInventory(this, type.getSize(), item.getDisplayName());
 
@@ -52,7 +52,10 @@ public class MachineInventory implements InventoryHolder {
                 inventory.setItem(27, energy);
                 break;
             case WIRE:
-                inventory.setItem(11, item.getItem());
+                inventory.setItem(13, energy);
+                break;
+            case JUNCTION_WIRE:
+                inventory.setItem(11, directionPanel.build());
                 inventory.setItem(15, energy);
                 break;
             case CARGO:
@@ -129,16 +132,16 @@ public class MachineInventory implements InventoryHolder {
         if (this.getMachine().getMachineItem().getType() == MachineType.WIRE) {
             if (val >= 1000) {
                 val = val * 0.001;
-                inv.setItem(15, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Energy: " + ChatColor.RED + val + "kJ").build());
+                inv.setItem(15, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Charge: " + ChatColor.RED + val + "C").build());
             } else {
-                inv.setItem(15, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Energy: " + ChatColor.RED + val + "J").build());
+                inv.setItem(15, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Charge: " + ChatColor.RED + val + "J").build());
             }
         } else {
             if (val >= 1000) {
                 val = val * 0.001;
-                inv.setItem(27, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Energy: " + ChatColor.RED + val + "kJ").build());
+                inv.setItem(27, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Charge: " + ChatColor.RED + val + "kJ").build());
             } else {
-                inv.setItem(27, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Energy: " + ChatColor.RED + val + "J").build());
+                inv.setItem(27, new ItemBuilder(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(ChatColor.GOLD + "Click to activate").setLore(ChatColor.YELLOW + "Charge: " + ChatColor.RED + val + "J").build());
             }
         }
     }

@@ -1,14 +1,13 @@
 name: Mechanix
 author: Etho5
 main: com.etho5.mechanix.Main
-description: Machines and shit.
-version: 0.0.1
-api-version: 1.15
-depend: [PlanetaryItems]
+description: Machines, etc.
+version: 0.0.2
+api-version: 1.18
 commands:
   mechanix:
     description: Base command for Mechanix. Includes GUIDE and GIVE subcommands.
-    aliases: [mech, sf]
+    aliases: [mech]
 permissions:
   mechanix.*:
     description: Allows for use of all Mechanix commands.
@@ -16,7 +15,7 @@ permissions:
     children:
       mechanix.give: true
   mechanix.give:
-    description: Gives a designated playe a specified Mechanix item.
+    description: Gives a designated player a specified Mechanix item.
     default: op
   mechanix.guide:
       description: ALlows a player to give themselves a Mechanix handbook.

@@ -39,6 +39,7 @@ public class ItemPackage {
         if(machine.getMachineItem().getType() == MachineType.CARGO) return;
         this.machine = machine;
         machinePackages.put(machine, this);
+        System.out.println("Package transferred to " + machine.toString());
     }
 
     public static ItemPackage getPackageFromMachine(Machine machine) {

@@ -22,8 +22,8 @@ public abstract class MachineRecipe {
         recipes.add(this);
     }
 
-    public static MachineRecipe getMachineRecipe(Machine machine) {
-        switch(machine.getMachineItem()) {
+    public static MachineRecipe getMachineRecipe(MachineItem item) {
+        switch(item) {
             case COMBUSTION_ENGINE:
                 return new CombustionEngine();
             case ARC_FURNACE:
@@ -44,6 +44,8 @@ public abstract class MachineRecipe {
                 return new Facilitator();
             case ORE_PROCESSOR:
                 return new OreProcessor();
+            case GEOTHERMAL_ENGINE:
+                return new GeothermalEngine();
             default:
                 return null;
         }
@@ -54,65 +56,76 @@ public abstract class MachineRecipe {
         MachineType type = machInv.getType();
 
         final int[] inputSlots = type.getInput();
-        final int[] outputSlots = type.getOutputOrWhitelist();
         if(inv.getContents() != null) {
 
             ItemStack[] contents = inv.getContents();
             ItemStack left = contents[inputSlots[0]];
             ItemStack right = contents[inputSlots[1]];
 
-            int count = 0;
             for (ItemStack[] r : recipe.validInputs()) {
                 List<ItemStack> item = Arrays.asList(r);
 
-                if (machine.getEnergy() < machine.getMachineItem().energyPerSecond) return;
+                if (machine.getChargeMagnitude() < machine.getMachineItem().current) return;
 
-                if (item.contains(left) && item.contains(right)) {
-
-                    for (int a : outputSlots) {
-
-                        if (inv.getItem(a) == null) {
-
-                            if(random) {
-                                determineOutputRandom(inv, recipe, machine, machInv, inputSlots, left, right, count, a);
-                            }
-                            else determineOutput(inv, recipe, machine, machInv, inputSlots, left, right, count, a);
-                        }
-                    }
+                if (item.contains(left) && item.contains(right) && recipe.validInputs().contains(r)) {
+                    if (random) {
+                        determineOutputTwoSlotsRandom(inv, recipe, machine, machInv, left, right, inputSlots[0], inputSlots[1], recipe.validInputs().indexOf(r));
+                    } else determineOutputTwoSlots(inv, recipe, machine, machInv, left, right, inputSlots[0], inputSlots[1], recipe.validInputs().indexOf(r));
                 }
-                count++;
             }
         }
     }
 
-    private static void determineOutput(Inventory inv, MachineRecipe recipe, Machine machine, MachineInventory machInv, int[] inputSlots, ItemStack input0, ItemStack input1, int count, int a) {
-        if(input0 != null) input0.setAmount(input0.getAmount() - 1);
-        if(input1 != null) input1.setAmount(input1.getAmount() - 1);
+    private static void determineOutputTwoSlotsRandom(Inventory inv, MachineRecipe recipe, Machine machine, MachineInventory machInv, ItemStack input0, ItemStack input1, int inputSlot0, int inputSlot1, int inputRecipeIndex) {
+        boolean hasStackable = false;
+        int stackableSlot = -1;
+        ItemStack result = recipe.validOutputs().get(inputRecipeIndex)[ThreadLocalRandom.current().nextInt(recipe.validOutputs().size() - 1)];
 
-        machine.setEnergy(machine.getEnergy() - machine.getMachineItem().energyPerSecond);
-        machInv.setInventoryEnergy(inv, machine.getEnergy());
+        for (int outputSlot : machInv.getType().getOutputOrWhitelist()) {
+            if (inv.getItem(outputSlot) != null) {
+                if (inv.getItem(outputSlot).getAmount() < 64 && inv.getItem(outputSlot).isSimilar(result)) {
+                    hasStackable = true;
+                    stackableSlot = outputSlot;
+                }
+            }
+        }
+        if (hasStackable && stackableSlot != -1) {
 
-        inv.setItem(a, new ItemStack(recipe.validOutputs().get(count)[0]));
+            inv.setItem(stackableSlot, result);
 
-        inv.setItem(inputSlots[0], input0);
-        inv.setItem(inputSlots[1], input1);
+            machine.setChargeMagnitude(machine.getChargeMagnitude() - machine.getMachineItem().current);
+            machInv.setInventoryEnergy(inv, machine.getChargeMagnitude());
 
-        machInv.setInventory(inv);
-    }
+            machInv.setInventory(inv);
+        }
 
-    private static void determineOutputRandom(Inventory inv, MachineRecipe recipe, Machine machine, MachineInventory machInv, int[] inputSlots, ItemStack input0, ItemStack input1, int count, int a) {
-        if(input0 != null) input0.setAmount(input0.getAmount() - 1);
-        if(input1 != null) input1.setAmount(input1.getAmount() - 1);
+        else {
 
-        machine.setEnergy(machine.getEnergy() - machine.getMachineItem().energyPerSecond);
-        machInv.setInventoryEnergy(inv, machine.getEnergy());
+            for (int outputSlot : machInv.getType().getOutputOrWhitelist()) {
 
-        inv.setItem(a, new ItemStack(recipe.validOutputs().get(count)[ThreadLocalRandom.current().nextInt(recipe.validOutputs().size() - 1)]));
+                if (inv.getItem(inputSlot0) != null && inv.getItem(inputSlot1) != null) {
+                    if (input0.getAmount() - 1 <= 0) {
+                        inv.setItem(inputSlot0, null);
+                    } else {
+                        input0.setAmount(input0.getAmount() - 1);
+                        inv.setItem(inputSlot0, input0);
+                    }
 
-        inv.setItem(inputSlots[0], input0);
-        inv.setItem(inputSlots[1], input1);
+                    if (input1.getAmount() - 1 <= 0) {
+                        inv.setItem(inputSlot1, null);
+                    } else {
+                        input1.setAmount(input1.getAmount() - 1);
+                        inv.setItem(inputSlot1, input1);
+                    }
+                }
 
-        machInv.setInventory(inv);
+                machine.setChargeMagnitude(machine.getChargeMagnitude() - machine.getMachineItem().current);
+                machInv.setInventoryEnergy(inv, machine.getChargeMagnitude());
+
+                inv.setItem(outputSlot, result);
+                machInv.setInventory(inv);
+            }
+        }
     }
 
     public static void updateMachineOneSlot(Inventory inv, MachineRecipe recipe, Machine machine) {
@@ -120,44 +133,151 @@ public abstract class MachineRecipe {
         MachineType type = machInv.getType();
 
         final int[] inputSlots = type.getInput();
-        final int[] outputSlots = type.getOutputOrWhitelist();
         if(inv.getContents() != null) {
 
             ItemStack[] contents = inv.getContents();
             ItemStack input0 = contents[inputSlots[0]];
             ItemStack input1 = contents[inputSlots[1]];
 
-            int count = 0;
-            for (ItemStack[] r : recipe.validInputs()) {
-                List<ItemStack> item = Arrays.asList(r);
+            if(input0 != null && input1 != null) {
 
-                if (machine.getEnergy() < machine.getMachineItem().energyPerSecond) return;
+                ItemStack input0Comp = input0.clone();
+                ItemStack input1Comp = input1.clone();
+                input0Comp.setAmount(1);
+                input1Comp.setAmount(1);
 
-                if (item.contains(input0)) {
-                    determineOutputOneSlot(inv, recipe, machine, machInv, inputSlots, outputSlots, input0, count);
-                    return;
+                for (ItemStack[] r : recipe.validInputs()) {
+                    List<ItemStack> item = Arrays.asList(r);
+
+                    if (machine.getChargeMagnitude() < machine.getMachineItem().current) return;
+
+                    if (recipe.validInputs().contains(r)) {
+                        if (item.contains(input0Comp)) {
+                            determineOutputOneSlot(inv, recipe, machine, machInv, input0, inputSlots[0], recipe.validInputs().indexOf(r));
+                            return;
+                        } else if (item.contains(input1Comp)) {
+                            determineOutputOneSlot(inv, recipe, machine, machInv, input1, inputSlots[1], recipe.validInputs().indexOf(r));
+                            return;
+                        }
+                    }
                 }
-                else if(item.contains(input1)) {
-                    determineOutputOneSlot(inv, recipe, machine, machInv, inputSlots, outputSlots, input1, count);
-                    return;
-                }
-                count++;
             }
         }
     }
 
-    private static void determineOutputOneSlot(Inventory inv, MachineRecipe recipe, Machine machine, MachineInventory machInv, int[] inputSlots, int[] outputSlots, ItemStack input, int count) {
-        for (int a : outputSlots) {
-            if (inv.getItem(a) == null) {
-                determineOutput(inv, recipe, machine, machInv, inputSlots, input, input, count, a);
+    private static void determineOutputOneSlot(Inventory inv, MachineRecipe recipe, Machine machine, MachineInventory machInv, ItemStack input, int inputSlot, int inputRecipeIndex) {
+
+        boolean hasStackable = false;
+        int stackableSlot = -1;
+        ItemStack result = recipe.validOutputs().get(inputRecipeIndex)[0];
+
+        for (int outputSlot : machInv.getType().getOutputOrWhitelist()) {
+            if (inv.getItem(outputSlot) != null) {
+                if (inv.getItem(outputSlot).getAmount() < 64 && inv.getItem(outputSlot).isSimilar(result)) {
+                    hasStackable = true;
+                    stackableSlot = outputSlot;
+                }
             }
         }
+
+        for (int outputSlot : machInv.getType().getOutputOrWhitelist()) {
+            if (hasStackable && stackableSlot != -1) {
+
+                if(inv.getItem(inputSlot) != null) {
+                    if(input.getAmount() - 1 <= 0) {
+                        inv.setItem(inputSlot, null);
+                    } else {
+                        input.setAmount(input.getAmount() - 1);
+                        inv.setItem(inputSlot, input);
+                    }
+                }
+
+                machine.setChargeMagnitude(machine.getChargeMagnitude() - machine.getMachineItem().current);
+                machInv.setInventoryEnergy(inv, machine.getChargeMagnitude());
+
+                inv.setItem(stackableSlot, result);
+
+                machInv.setInventory(inv);
+                break;
+            }
+
+            else {
+
+                if(inv.getItem(inputSlot) != null) {
+                    if(input.getAmount() - 1 <= 0) {
+                        inv.setItem(inputSlot, null);
+                    } else {
+                        input.setAmount(input.getAmount() - 1);
+                        inv.setItem(inputSlot, input);
+                    }
+                }
+
+                machine.setChargeMagnitude(machine.getChargeMagnitude() - machine.getMachineItem().current);
+                machInv.setInventoryEnergy(inv, machine.getChargeMagnitude());
+
+                inv.setItem(outputSlot, result);
+                machInv.setInventory(inv);
+            }
+        }
+    }
+
+    private static void determineOutputTwoSlots(Inventory inv, MachineRecipe recipe, Machine machine, MachineInventory machInv, ItemStack input0, ItemStack input1, int inputSlot0, int inputSlot1, int inputRecipeIndex) {
+
+        boolean hasStackable = false;
+        int stackableSlot = -1;
+        ItemStack result = recipe.validOutputs().get(inputRecipeIndex)[0];
+
+        for (int outputSlot : machInv.getType().getOutputOrWhitelist()) {
+            if (inv.getItem(outputSlot) != null) {
+                if (inv.getItem(outputSlot).getAmount() < 64 && inv.getItem(outputSlot).isSimilar(result)) {
+                    hasStackable = true;
+                    stackableSlot = outputSlot;
+                }
+            }
+        }
+            if (hasStackable && stackableSlot != -1) {
+
+                inv.setItem(stackableSlot, result);
+
+                machine.setChargeMagnitude(machine.getChargeMagnitude() - machine.getMachineItem().current);
+                machInv.setInventoryEnergy(inv, machine.getChargeMagnitude());
+
+                machInv.setInventory(inv);
+            }
+
+            else {
+
+                for (int outputSlot : machInv.getType().getOutputOrWhitelist()) {
+
+                    if (inv.getItem(inputSlot0) != null && inv.getItem(inputSlot1) != null) {
+                        if (input0.getAmount() - 1 <= 0) {
+                            inv.setItem(inputSlot0, null);
+                        } else {
+                            input0.setAmount(input0.getAmount() - 1);
+                            inv.setItem(inputSlot0, input0);
+                        }
+
+                        if (input1.getAmount() - 1 <= 0) {
+                            inv.setItem(inputSlot1, null);
+                        } else {
+                            input1.setAmount(input1.getAmount() - 1);
+                            inv.setItem(inputSlot1, input1);
+                        }
+                    }
+
+                    machine.setChargeMagnitude(machine.getChargeMagnitude() - machine.getMachineItem().current);
+                    machInv.setInventoryEnergy(inv, machine.getChargeMagnitude());
+
+                    inv.setItem(outputSlot, result);
+                    machInv.setInventory(inv);
+                }
+            }
     }
 
     public static void updateGenerator(Inventory inv, MachineRecipe recipe, Machine generator) {
 
-        if(generator.getEnergy() >= generator.getMachineItem().maxEnergy) {
-            generator.setEnergy(generator.getMachineItem().maxEnergy);
+        if(generator.getChargeMagnitude() >= generator.getMachineItem().maxCharge) {
+            generator.setChargeMagnitude(generator.getMachineItem().maxCharge);
             return;
         }
 
@@ -172,10 +292,6 @@ public abstract class MachineRecipe {
             if(inv.getContents() != null) {
 
                 final int[] inputSlots = type.getInput();
-//                List<ItemStack> items = new ArrayList<>();
-//                for(int b : inputSlots) {
-//                    items.add(inv.getItem(b));
-//                }
 
                 for (int inputSlot : inputSlots) {
                     ItemStack a = inv.getItem(inputSlot);
@@ -183,11 +299,11 @@ public abstract class MachineRecipe {
                     if (a != null && mat.contains(a.getType())) {
 
                         a.setAmount(a.getAmount() - 1);
-                        generator.setEnergy(Math.min(generator.getEnergy() + generator.getMachineItem().energyPerSecond, generator.getMachineItem().maxEnergy));
+                        generator.setChargeMagnitude(Math.min(generator.getChargeMagnitude() + generator.getMachineItem().current, generator.getMachineItem().maxCharge));
 
                         inv.setItem(inputSlot, a);
 
-                        genInv.setInventoryEnergy(inv, generator.getEnergy());
+                        genInv.setInventoryEnergy(inv, generator.getChargeMagnitude());
 
                         genInv.setInventory(inv);
                     }

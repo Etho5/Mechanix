@@ -13,6 +13,8 @@ public enum MachineType {
     GENERATOR(45, new int[]{13, 14, 15, 22, 23, 24, 31, 32, 33}, null, 13, 14, 15, 22, 23, 24, 31, 32, 33),
     @SerializedName("Wire")
     WIRE(27, null, null, -1),
+    @SerializedName("JunctionWire")
+    JUNCTION_WIRE(27, null, null, 11),
     @SerializedName("Cargo")
     CARGO(45,null, new int[]{13, 14, 15, 16, 22, 23, 24, 25, 31, 32, 33, 34}, 13, 14, 15, 16, 22, 23, 24, 25, 31, 32, 33, 34);
 

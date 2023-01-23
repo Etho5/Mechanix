@@ -32,7 +32,7 @@ public class MenuManager {
         List<ItemStack> ings = new ArrayList<>();
         for (IngredientList i : IngredientList.values()) {
             MenuInventory inv = new MenuInventory(i);
-            menus.put(i.getItem(), inv);
+            menus.put(inv.getItem(), inv);
             ings.add(inv.getItem());
         }
 
