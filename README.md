@@ -1,2 +1,2 @@
 # Mechanix
-Machinery (and some chemistry) plugin for the Colenia Network.
+Machinery (and some chemistry) plugin for Minecraft: Java Edition.
