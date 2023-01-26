@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -92,7 +91,7 @@ public class MachineInventory implements InventoryHolder, Serializable {
         return Machine.invMap.get(this);
     }
 
-    public @NotNull Inventory getInventory() {
+    public Inventory getInventory() {
         return this.inventory;
     }
 

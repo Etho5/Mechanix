@@ -6,13 +6,13 @@ import com.etho5.mechanix.ingredients.IngredientList;
 import com.etho5.mechanix.machines.MachineItem;
 import com.etho5.mechanix.utils.ItemBuilder;
 import com.etho5.mechanix.utils.Utils;
+import com.sun.istack.internal.NotNull;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
