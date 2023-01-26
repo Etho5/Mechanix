@@ -4,6 +4,7 @@ import com.etho5.mechanix.ingredients.IngredientList;
 import com.etho5.mechanix.machines.MachineItem;
 import com.etho5.mechanix.menus.MenuBook;
 import com.etho5.mechanix.utils.Utils;
+import com.sun.istack.internal.NotNull;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -11,7 +12,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.StringUtil;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.ArrayList;
 import java.util.List;

@@ -34,7 +34,7 @@ public class Main extends JavaPlugin {
 
         System.out.println("[Mechanix] Loading machines...");
 //        MachineSerializer.loadMachines();
-        if(MachineSerializer.loadMachines()) {
+        if(MachineSerializer.loadMachines(this)) {
             System.out.println("[Mechanix] Machine data has been loaded.");
         } else {
             System.out.println("[Mechanix] Error with machine loading! Check stack trace above!");
@@ -67,7 +67,7 @@ public class Main extends JavaPlugin {
         System.out.println("[Mechanix] Saving machine data...");
 //        if(manager != null) persist.save(manager);
 //        MachineSerializer.saveMachines();
-        if(MachineSerializer.saveMachines()) {
+        if(MachineSerializer.saveMachines(this)) {
             System.out.println("[Mechanix] Machine data has been saved.");
         } else {
             System.out.println("[Mechanix] Error with machine saving! Check stack trace above!");

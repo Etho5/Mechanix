@@ -1,14 +1,17 @@
 package com.etho5.mechanix.saving;
 
+import com.etho5.mechanix.Main;
 import com.etho5.mechanix.abstraction.MachineRecipe;
 import com.etho5.mechanix.machines.Machine;
 import com.etho5.mechanix.machines.MachineInventory;
 import com.etho5.mechanix.machines.MachineItem;
+import com.etho5.mechanix.utils.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
@@ -37,15 +40,14 @@ public class MachineSerializer implements Serializable {
         String content = toBase64(playerInventory);
         String armor = itemStackArrayToBase64(playerInventory.getArmorContents());
 
-        return new String[] { content, armor };
+        return new String[]{content, armor};
     }
 
     /**
-     *
      * A method to serialize an {@link ItemStack} array to Base64 String.
-     *
-     * <p />
-     *
+     * <p>
+     * <p/>
+     * <p>
      * Based off of {@link #toBase64(Inventory)}.
      *
      * @param items to turn into a Base64 String.
@@ -74,9 +76,9 @@ public class MachineSerializer implements Serializable {
 
     /**
      * A method to serialize an inventory to Base64 string.
-     *
-     * <p />
-     *
+     * <p>
+     * <p/>
+     * <p>
      * Special thanks to Comphenix in the Bukkit forums or also known
      * as aadnk on GitHub.
      *
@@ -107,11 +109,10 @@ public class MachineSerializer implements Serializable {
     }
 
     /**
-     *
      * A method to serialize an {@link Machine} array to Base64 String.
-     *
-     * <p />
-     *
+     * <p>
+     * <p/>
+     * <p>
      * Based off of {@link #itemStackArrayToBase64(ItemStack[])}.
      *
      * @param machines to turn into a Base64 String.
@@ -133,11 +134,10 @@ public class MachineSerializer implements Serializable {
     }
 
     /**
-     *
      * A method to get an {@link Inventory} from an encoded, Base64, string.
-     *
-     * <p />
-     *
+     * <p>
+     * <p/>
+     * <p>
      * Special thanks to Comphenix in the Bukkit forums or also known
      * as aadnk on GitHub.
      *
@@ -166,9 +166,9 @@ public class MachineSerializer implements Serializable {
 
     /**
      * Gets an array of ItemStacks from Base64 string.
-     *
-     * <p />
-     *
+     * <p>
+     * <p/>
+     * <p>
      * Base off of {@link #fromBase64(String)}.
      *
      * @param data Base64 string to convert to ItemStack array.
@@ -190,9 +190,9 @@ public class MachineSerializer implements Serializable {
 
     /**
      * Gets a List of Machines from Base64 string.
-     *
-     * <p />
-     *
+     * <p>
+     * <p/>
+     * <p>
      * Base off of {@link #itemStackArrayFromBase64(String)}.
      *
      * @param data Base64 string to convert to ItemStack array.
@@ -211,8 +211,8 @@ public class MachineSerializer implements Serializable {
             List<Machine> machines = new ArrayList<>();
 
             // get rid of any non-existent machines
-            for(Machine m : machinesRaw) {
-                if(m != null) machines.add(m);
+            for (Machine m : machinesRaw) {
+                if (m != null) machines.add(m);
             }
 
             return machines;
@@ -223,12 +223,17 @@ public class MachineSerializer implements Serializable {
 
     /**
      * Attempts to save the master Machine List to a File.
+     *
      * @return true if the list was saved successfully, false otherwise
      */
-    public static boolean saveMachines() {
+    public static boolean saveMachines(final Main plugin) {
         try {
-            Path p = Paths.get("machines.data");
-            FileOutputStream fOut = new FileOutputStream(p.toFile());
+            File file = new File(plugin.getDataFolder(), "machines.data");
+            if (!file.exists()) {
+                System.out.println("Running create");
+                plugin.saveResource("machines.data", false);
+            }
+            FileOutputStream fOut = new FileOutputStream(file);
             BufferedOutputStream bOut = new BufferedOutputStream(fOut);
             String data = machineListToBase64(Machine.machines);
 
@@ -236,7 +241,7 @@ public class MachineSerializer implements Serializable {
             bOut.close();
             fOut.close();
             return true;
-        } catch(IOException | InvalidPathException e) {
+        } catch (IOException | InvalidPathException e) {
             e.printStackTrace();
             return false;
         }
@@ -245,17 +250,19 @@ public class MachineSerializer implements Serializable {
 
     /**
      * Attempts to load the master Machine List from a File.
+     *
      * @return true if the list was loaded successfully, false otherwise
      */
-    public static boolean loadMachines() {
+    public static boolean loadMachines(final Main plugin) {
         try {
-            Path p = Paths.get("machines.data");
-            byte[] bytes = Files.readAllBytes(p);
+            File file = new File(plugin.getDataFolder(), "machines.data");
+            if (!file.exists()) return false;
+            byte[] bytes = Files.readAllBytes(file.toPath());
             String s = new String(bytes);
 
             Machine.machines = machineListFromBase64(s);
             return true;
-        } catch(IOException | InvalidPathException e) {
+        } catch (IOException | InvalidPathException e) {
             e.printStackTrace();
             return false;
         }
